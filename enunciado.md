@@ -53,7 +53,7 @@ Faça o robô girar e fazer uma volta completa.
 
 Durante esta volta completa, o robô deve *guardar* a posição da caixa mais próxima da cor desejada.
 
-Depois de completada a volta, o robô deve retornar à posição e terminar centralizado na caixa mais próxima da cor desejada. 
+Depois de completada a volta, o robô deve retornar à posição e terminar centralizado na caixa mais próxima da cor desejada. Você pode determinar qual caixa é mais próxima tanto usando a medida de distância do *scan laser* quanto analisando qual aparece maior na imagem. 
 
 Lembramos que a tabela acima define qual sua cor desejada. 
 
