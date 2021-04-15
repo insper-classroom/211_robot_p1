@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # Este NÃO é um programa ROS
@@ -14,7 +14,21 @@ print("OpenCV versão: ", cv2.__version__)
 print("Diretório de trabalho: ", os.getcwd())
 
 # Arquivos necessários
-video = "jogovelha.mp4"
+video = "bandeiras_movie.mp4"
+
+corner_jp = ((10,10),(100,100))
+corner_pl = ((5,5),(200,200))
+
+
+# Responda dentro desta função. 
+# Pode criar e chamar novas funções o quanto quiser
+def encontra_japao_polonia_devolve_corners(bgr):
+    frame = bgr.copy()
+    return frame, corner_jp, corner_pl
+
+
+
+
 
 
 if __name__ == "__main__":
@@ -39,11 +53,18 @@ if __name__ == "__main__":
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
+        # Programe só na função encontra_japao_devolve_corners. Pode criar funções se quiser
+        saida, japao, polonia = encontra_japao_polonia_devolve_corners(frame)
+
+        print("Corners x-y Japao")
+        print(japao)
+        print("Corners x-y Polonia")
+        print(polonia)
 
         # NOTE que em testes a OpenCV 4.0 requereu frames em BGR para o cv2.imshow
-        cv2.imshow('imagem', frame)
+        cv2.imshow('imagem', saida)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(1000) & 0xFF == ord('q'):
             break
 
     # When everything done, release the capture
