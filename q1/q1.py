@@ -18,8 +18,6 @@ files = "chess01.png chess02.png chess03.png chess04.png".split()
 
 nd = " " # vazio
 
-# Lista vazia para ser tabuleiro
-board = [[nd,nd,nd,nd,nd], [nd,nd,nd,nd,nd], [nd,nd,nd,nd,nd], [nd,nd,nd,nd,nd], [nd,nd,nd,nd,nd]]
 
 # Só teremos reis e peões e o tabuleiro é 5x5 somente
 rei_preto = "BK" # black king
@@ -31,7 +29,9 @@ peao_branco = "WP" # white pawn
 # Trabalhe nesta função
 # Pode criar e chamar novas funções o quanto quiser
 def processa(frame_bgr): 
-    img = frame_bgr.copy()
+    img = frame_bgr.copy()    
+    # Lista vazia para ser tabuleiro
+    board = [[nd,nd,nd,nd,nd], [nd,nd,nd,nd,nd], [nd,nd,nd,nd,nd], [nd,nd,nd,nd,nd], [nd,nd,nd,nd,nd]]    
     tabuleiro = board.copy()
     # Este código é só exemplo da lógica 
     # Use a notação linha x coluna
