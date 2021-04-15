@@ -50,7 +50,7 @@ Para executar arquivos do ROS, faça:
 
     rosrun p1_211 arquivo.py 
 
-Onde `arquivo.py` é algum script Python executável que você deve ter na pasta `sim202/scripts`.
+Onde `arquivo.py` é algum script Python executável que você deve ter na pasta `p1_211/scripts`.
 
 Note que o programa q1.py podem ser simplesmente executados direto porque não precisa de ROS.
 
