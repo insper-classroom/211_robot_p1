@@ -64,7 +64,7 @@ if __name__ == "__main__":
         # NOTE que em testes a OpenCV 4.0 requereu frames em BGR para o cv2.imshow
         cv2.imshow('imagem', saida)
 
-        if cv2.waitKey(1000) & 0xFF == ord('q'):
+        if cv2.waitKey(15) & 0xFF == ord('q'):
             break
 
     # When everything done, release the capture
