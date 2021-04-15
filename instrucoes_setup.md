@@ -7,7 +7,7 @@ Essas variáveis estarão desabilitadas se tiverem um `#` precedendo a linha.
 
 ## Versão do Python
 
-Os códigos ROS são compatíveis somente com Python 2.
+Os códigos ROS são compatíveis somente com Python 3 no ROS Noetic e Python 2 no ROS Melodic.
 
 Preficar executar as questões usando o comando `rosrun`. 
 
