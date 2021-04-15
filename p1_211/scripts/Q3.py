@@ -39,6 +39,8 @@ def roda_todo_frame(imagem):
     try:
         cv_image = bridge.compressed_imgmsg_to_cv2(imagem, "bgr8")
         cv2.imshow("Camera", cv_image)
+        ##
+        copia = cv_image.copy() # se precisar usar no while
         cv2.waitKey(1)
     except CvBridgeError as e:
         print('ex', e)
