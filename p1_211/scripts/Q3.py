@@ -38,11 +38,11 @@ maxv = 10
 
 bridge = CvBridge()
 
-def quart_to_euler(orientacao)
-"""
-Converter quart. para euler (XYZ)
-Retorna apenas o Yaw (wz)
-"""
+def quart_to_euler(orientacao):
+    """
+    Converter quart. para euler (XYZ)
+    Retorna apenas o Yaw (wz)
+    """
     r = R.from_quat(orientacao)
     wx, wy, wz = (r.as_euler('xyz', degrees=True))
 
