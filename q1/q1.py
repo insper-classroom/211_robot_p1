@@ -30,9 +30,9 @@ def encontrar_contornos(mask):
         deve receber uma imagem preta e branca os contornos encontrados
     """
     # RETR_EXTERNAL: Apenas Contornos Externos
-    contornos, arvore = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)  # 
+    contornos, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-    return contornos, arvore
+    return contornos
 
 def crosshair(img, point, size, color):
     """ Desenha um crosshair centrado no point.
@@ -93,7 +93,7 @@ def processa(frame_bgr):
     output = cv2.morphologyEx(output, cv2.MORPH_CLOSE, np.ones((10,10),np.uint8))
 
     ## Encontrar Contornos
-    contornos, _ = encontrar_contornos(output)
+    contornos = encontrar_contornos(output)
 
     ## Encontrar Centro de Cada Peca
     img, X, Y, area = encontrar_centro_dos_contornos(img, contornos)
@@ -108,7 +108,7 @@ def processa(frame_bgr):
         y = Y[i]//93            # Divisão dupla para retornar um inteiro
         tabuleiro[y][x] = peca_e_cor(img,X[i],Y[i],area[i])
 
-    return tabuleiro, img, output
+    return tabuleiro, img
 
 
 
@@ -127,14 +127,13 @@ if __name__ == "__main__":
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # Você vai trabalhar na função processa!
-        tabuleiro, imagem, output = processa(frame)
+        tabuleiro, imagem = processa(frame)
 
         print("Tabuleiro")
         print(tabuleiro)
 
         # NOTE que em testes a OpenCV 4.0 requereu frames em BGR para o cv2.imshow
         cv2.imshow('imagem processada', imagem)
-        cv2.imshow('output processada', output)
 
         if cv2.waitKey(1500) & 0xFF == ord('q'):
             break
