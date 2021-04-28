@@ -66,10 +66,10 @@ def scaneou(dado):
     Rebe a Leitura do Lidar
     Para esta aplicacao, apenas a menor distancia esta sendo usada
     """
-	global distancia
-
-	ranges = np.array(dado.ranges).round(decimals=2)
-	distancia = ranges[0]
+    global distancia
+    
+    ranges = np.array(dado.ranges).round(decimals=2)
+    distancia = ranges[0]
 
 # A função a seguir é chamada sempre que chega um novo frame
 def roda_todo_frame(imagem):
