@@ -24,11 +24,6 @@ from sensor_msgs.msg import LaserScan
 from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
 
-from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Pose
-
-from scipy.spatial.transform import Rotation as R
-
 import math
 
 
@@ -38,34 +33,10 @@ maxv = 10
 
 bridge = CvBridge()
 
-def quart_to_euler(orientacao)
-"""
-Converter quart. para euler (XYZ)
-Retorna apenas o Yaw (wz)
-"""
-    r = R.from_quat(orientacao)
-    wx, wy, wz = (r.as_euler('xyz', degrees=True))
-
-    return wz
 
 ## ROS
-def mypose(msg):
-    """
-    Recebe a Leitura da Odometria.
-    Para esta aplicacao, apenas a orientacao esta sendo usada
-    """
-    x = msg.pose.pose.orientation.x
-    y = msg.pose.pose.orientation.y
-    z = msg.pose.pose.orientation.z
-    w = msg.pose.pose.orientation.w
-
-    orientacao_robo = [[x,y,z,w]]
-
 def scaneou(dado):
-    """
-    Rebe a Leitura do Lidar
-    Para esta aplicacao, apenas a menor distancia esta sendo usada
-    """
+
 	global distancia
 
 	ranges = np.array(dado.ranges).round(decimals=2)
@@ -90,7 +61,7 @@ if __name__=="__main__":
     velocidade_saida = rospy.Publisher("/cmd_vel", Twist, queue_size = 3 )
 
     recebe_scan = rospy.Subscriber("/scan", LaserScan, scaneou)
-    pose_sub = rospy.Subscriber('/odom', Odometry , mypose)
+    pose_sub = rospy.Subscriber('/odom', Odometry , self.sub_callback)
     recebedor = rospy.Subscriber(topico_imagem, CompressedImage, roda_todo_frame, queue_size=4, buff_size = 2**24)
 
     while not rospy.is_shutdown():
