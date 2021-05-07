@@ -75,9 +75,9 @@ def center_of_mass_region(mask, x1, y1, x2, y2):
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
-def texto(img, a, p):
+def texto(img, a, p, color = (0,50,100)):
     """Escreve na img RGB dada a string a na posição definida pela tupla p"""
-    cv2.putText(img, str(a), p, font,1,(0,50,100),2,cv2.LINE_AA)
+    cv2.putText(img, str(a), p, font,1, color ,1,cv2.LINE_AA)
     
 
 ## Fim do código vindo de https://github.com/Insper/robot21.1/blob/main/aula03/centro_do_amarelo.py
