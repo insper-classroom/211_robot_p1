@@ -37,6 +37,9 @@ y = -1
 contador = 0
 radianos = None
 pula = 10
+X = [0]
+na_image = False
+
 ## Processamento de Imagem
 def filtra_image(hsv, lower_blue, upper_blue):
     """Filtrar o range da cor. Aplica OPENING na imagem para remover FP"""
@@ -54,20 +57,21 @@ def encontrar_contornos(mask):
 
     return contornos
 
-def crosshair(img, point, size, color):
+def crosshair(cv_image, point, size, color):
     """ Desenha um crosshair centrado no point.
         point deve ser uma tupla (x,y)
         color é uma tupla R,G,B uint8
     """
     x,y = point
-    cv2.line(img,(x - size,y),(x + size,y),color,2)
-    cv2.line(img,(x,y - size),(x, y + size),color,2)
+    cv2.line(cv_image,(x - size,y),(x + size,y),color,2)
+    cv2.line(cv_image,(x,y - size),(x, y + size),color,2)
+    return cv_image
 
-def encontrar_centro_dos_contornos(img, contornos):
+def encontrar_centro_dos_contornos(cv_image, contornos):
     """Não mude ou renomeie esta função
         deve receber um contorno e retornar, respectivamente, a imagem com uma cruz no centro de cada segmento e o centro dele. formato: img, x, y
     """
-    img_copia = img.copy()
+    global X
     X = []
     Y = []
     area = []
@@ -79,12 +83,11 @@ def encontrar_centro_dos_contornos(img, contornos):
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
             centro = (cX, cY)
-            crosshair(img_copia, centro, 5, [255, 0, 0])
+            crosshair(cv_image, centro, 5, [255, 0, 0])
             X.append(cX)
             Y.append(cY)
             area.append(cv2.contourArea(contorno))
-
-    return img_copia, X, Y, area
+    return cv_image
 
 ##
 def recebe_odometria(data):
@@ -136,10 +139,8 @@ def scaneou(dado):
 # A função a seguir é chamada sempre que chega um novo frame
 def roda_todo_frame(imagem):
     global na_image
-    global bX
     try:
         cv_image = bridge.compressed_imgmsg_to_cv2(imagem, "bgr8")
-        
         hsv = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
 
         if cor == 'Amarelo':
@@ -163,8 +164,8 @@ def roda_todo_frame(imagem):
         else:
             na_image = True
 
-        ## Encontrar Centro de Cada Peca
-        cv_image, bX, _, _ = encontrar_centro_dos_contornos(cv_image, contornos)
+            ## Encontrar Centro de Cada Peca
+            cv_image = encontrar_centro_dos_contornos(cv_image, contornos)
 
         cv2.imshow("Camera", cv_image)
         # cv2.imshow("Camera", mask)
@@ -172,7 +173,7 @@ def roda_todo_frame(imagem):
     except CvBridgeError as e:
         print('ex', e)
 
-w_vel = 0.8
+w_vel = 0.6
 
 if __name__=="__main__":
 
@@ -188,11 +189,12 @@ if __name__=="__main__":
     recebe_scan = rospy.Subscriber("/scan", LaserScan, scaneou)
     ref_odometria = rospy.Subscriber("/odom", Odometry, recebe_odometria)
     recebedor = rospy.Subscriber(topico_imagem, CompressedImage, roda_todo_frame, queue_size=4, buff_size = 2**24)
-
+    
+    r = rospy.Rate(100) # Roda em ~100hz 
     while not rospy.is_shutdown():
         if state == 0:
             """Estado 0: Robo inicia a volta, passa para o estado 1"""
-            start_time = rospy.Time.to_sec(rospy.Time.now())
+            start_time = rospy.Time.now()
             vel = Twist(Vector3(0,0,0), Vector3(0,0,w_vel))
             velocidade_saida.publish(vel)
 
@@ -203,7 +205,7 @@ if __name__=="__main__":
             vel = Twist(Vector3(0,0,0), Vector3(0,0,w_vel))
             
             ## Tempo = Distancia / Velocidade
-            if rospy.Time.to_sec(rospy.Time.now()) - start_time > 2.1 * math.pi / w_vel:
+            if rospy.Time.now() - start_time >= rospy.Duration.from_sec(2.1 * math.pi / w_vel):
                 vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
 
                 state = 2
@@ -219,7 +221,7 @@ if __name__=="__main__":
                 w_vel = - w_vel
 
             distancia_angulo = np.radians(abs(distancia_angulo))
-            start_time = rospy.Time.to_sec(rospy.Time.now())
+            start_time = rospy.Time.now()
             vel = Twist(Vector3(0,0,0), Vector3(0,0,w_vel))
             velocidade_saida.publish(vel)
 
@@ -230,16 +232,23 @@ if __name__=="__main__":
                 passa para o estado 4 (estado neutro)"""
             vel = Twist(Vector3(0,0,0), Vector3(0,0,w_vel))
 
-            if rospy.Time.to_sec(rospy.Time.now()) - start_time > abs(distancia_angulo / w_vel):
-                print('loop')
-                vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
-
+            if rospy.Time.now() - start_time >= rospy.Duration.from_sec(abs(distancia_angulo / w_vel)):
                 state = 4
 
+        if state == 4:
+            """Estado 3: Com movimento constante, robo verifica se passou o tempo e para na caixa, 
+                passa para o estado 4 (estado neutro)"""
+            print("Adjusting")
+            print(X)
+            if X[0] > 338 and  X[0] < 342:
+                vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+                
+                state = 5
+            elif X[0] > 240:
+                vel = Twist(Vector3(0,0,0), Vector3(0,0,-0.2))
+            elif X[0] < 240:
+                vel = Twist(Vector3(0,0,0), Vector3(0,0,0.2))
+        
             velocidade_saida.publish(vel)
 
-        print(state)
-        rospy.sleep(0.1)
-
-
-
+        r.sleep()
