@@ -3,6 +3,8 @@
 
 from __future__ import print_function, division
 
+## GABARITO - código pode ser visto em execução em 
+# https://youtu.be/S0I6IIC85UY
 
 # Para rodar, recomendamos que faça:
 # 
@@ -119,8 +121,8 @@ def roda_todo_frame(imagem):
 
             angle_yellow = ang_deg
 
-            q3utils.texto(saida_bgr, f"Angulo graus: {ang_deg}", (15,50))
-            q3utils.texto(saida_bgr, f"Angulo rad: {ang}", (15,90))
+            q3utils.texto(saida_bgr, f"Angulo graus: {ang_deg}", (15,50), color=(0,255,255))
+            q3utils.texto(saida_bgr, f"Angulo rad: {ang}", (15,90), color=(0,255,255))
 
             cv2.imshow("centro", img)
             cv2.imshow("angulo", saida_bgr)
@@ -160,14 +162,14 @@ if __name__=="__main__":
     x = 0
     tol_centro = 10 # tolerancia de fuga do centro
     tol_ang = 15 # tolerancia do angulo
-    area_ideal_caixa = 10000
+    area_ideal_caixa = 12000
 
-    c_img = 320 # Centro da imagem
+    c_img = (320,240) # Centro da imagem  que ao todo é 640 x 480
 
-    v_slow = 0.2
-    v_rapido = 0.5
-    w_slow = 0.1 
-    w_rapido = 0.6
+    v_slow = 0.3
+    v_rapido = 0.85
+    w_slow = 0.2
+    w_rapido = 0.75
 
     
     INICIAL= -1
@@ -189,17 +191,17 @@ if __name__=="__main__":
 
     def avanca_rapido():
         vel = Twist(Vector3(v_slow,0,0), Vector3(0,0,0))         
-        cmd_vel.publish(v_rapido)
+        cmd_vel.publish(vel)
 
     def alinha():
-        delta_x = c_img - centro_centro_yellow[x]
+        delta_x = c_img[x] - centro_yellow[x]
         max_delta = 150.0
-        w = w_min + (delta_x/max_delta)*w_rapido
+        w = (delta_x/max_delta)*w_rapido
         vel = Twist(Vector3(v_slow,0,0), Vector3(0,0,w)) 
         cmd_vel.publish(vel)        
 
     def avanca_proximo():
-        pass
+       pass
 
     def terminou():
         zero = Twist(Vector3(0,0,0), Vector3(0,0,0))         
@@ -207,21 +209,28 @@ if __name__=="__main__":
 
     def dispatch():
         "Logica de determinar o proximo estado"
+        global state
         if area_caixa >= area_ideal_caixa:
             state = TERMINOU
+            return
+
+        if c_img[x] - tol_centro < centro_yellow[x] < c_img[x] + tol_centro:
+            state = AVANCA
+            if   - tol_ang< angle_yellow  < tol_ang:  # para angulos centrados na vertical, regressao de x = f(y) como está feito
+                state = AVANCA_RAPIDO
         else: 
-            if c_img - tol_centro < centro_yellow[x] < c_img + tol_centro:
-                state = AVANCA
-                if   - tol_ang< angle_yellow  < tol_ang:  # para angulos centrados na vertical, regressao de x = f(y) como está feito
-                    state = AVANCA_RAPIDO
-            else:         
                 state = ALINHA
-        print("centro_yellow {} area caixa {:.2f} angle_yellow {:.3f}".format(centro_yellow, area_caixa, angle_yellow))
+
+        print("centro_yellow {} area caixa {:.2f} angle_yellow {:.3f} state: {}".format(centro_yellow, area_caixa, angle_yellow, state))
+        
+
     acoes = {INICIAL:inicial, AVANCA: avanca, AVANCA_RAPIDO: avanca_rapido, ALINHA: alinha, AVANCA_PROXIMO: avanca_proximo , TERMINOU: terminou}
 
+
+    r = rospy.Rate(200) 
 
     while not rospy.is_shutdown():
         print("Estado: ", state)
         acoes[state]()  # executa a funcão que está no dicionário
-        dispatch()    
-        rospy.sleep(0.05)
+        dispatch()            
+        r.sleep()
