@@ -30,6 +30,8 @@ from geometry_msgs.msg import Pose
 from scipy.spatial.transform import Rotation as R
 
 import math
+import Q3_utils as q3utils
+
 
 
 ranges = None
@@ -71,13 +73,49 @@ def scaneou(dado):
     ranges = np.array(dado.ranges).round(decimals=2)
     distancia = ranges[0]
 
+
+
+## Variáveis novas criadas pelo gabarito
+
+centro_yellow = (320,240)
+frame = 0
+skip = 3
+m = 0
+angle_yellow = 0 # angulo com a vertical
+
+low = q3utils.low
+high = q3utils.high
+
+## 
+
 # A função a seguir é chamada sempre que chega um novo frame
 def roda_todo_frame(imagem):
+    global centro_yellow
+    global m
+    global angle_yellow
+
     try:
         cv_image = bridge.compressed_imgmsg_to_cv2(imagem, "bgr8")
         cv2.imshow("Camera", cv_image)
         ##
         copia = cv_image.copy() # se precisar usar no while
+
+        if frame%skip==0: # contamos a cada skip frames
+            mask = q3utils.filter_color(copia, low, high)                
+            img, centro_yellow  =  q3utils.center_of_mass_region(mask, 0, 300, mask.shape[1], mask.shape[0])  
+
+            saida_bgr, m, h = q3utils.ajuste_linear_grafico_x_fy(mask)
+
+            ang = math.atan(m)
+            ang_deg = math.degrees(ang)
+
+            q3utils.texto(saida_bgr, f"Angulo graus: {ang_deg}", (15,50))
+            q3utils.texto(saida_bgr, f"Angulo rad: {ang}", (15,90))
+
+            cv2.imshow("centro", img)
+            cv2.imshow("angulo", saida_bgr)
+
+
         cv2.waitKey(1)
     except CvBridgeError as e:
         print('ex', e)
