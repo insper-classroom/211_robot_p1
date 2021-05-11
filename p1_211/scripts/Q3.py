@@ -209,13 +209,13 @@ if __name__=="__main__":
         "Logica de determinar o proximo estado"
         if area_caixa >= area_ideal_caixa:
             state = TERMINOU
-        elif c_img - tol_centro < centro_yellow[x] < c_img + tol_centro:
-            state = AVANCA
-
-            if   - tol_ang< angle_yellow  < tol_ang:  # para angulos centrados na vertical, regressao de x = f(y) como está feito
-                state = AVANCA_RAPIDO
-        else:
-            state = ALINHA
+        else: 
+            if c_img - tol_centro < centro_yellow[x] < c_img + tol_centro:
+                state = AVANCA
+                if   - tol_ang< angle_yellow  < tol_ang:  # para angulos centrados na vertical, regressao de x = f(y) como está feito
+                    state = AVANCA_RAPIDO
+            else:         
+                state = ALINHA
         print("centro_yellow {} area caixa {:.2f} angle_yellow {:.3f}".format(centro_yellow, area_caixa, angle_yellow))
     acoes = {INICIAL:inicial, AVANCA: avanca, AVANCA_RAPIDO: avanca_rapido, ALINHA: alinha, AVANCA_PROXIMO: avanca_proximo , TERMINOU: terminou}
 
