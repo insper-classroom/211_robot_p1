@@ -81,7 +81,7 @@ def scaneou(dado):
 
 centro_yellow = (320,240)
 frame = 0
-skip = 3
+skip = 2
 m = 0
 angle_yellow = 0 # angulo com a vertical
 
@@ -166,10 +166,10 @@ if __name__=="__main__":
 
     c_img = (320,240) # Centro da imagem  que ao todo é 640 x 480
 
-    v_slow = 0.3
-    v_rapido = 0.85
-    w_slow = 0.2
-    w_rapido = 0.75
+    v_slow = 0.4
+    v_rapido = 1.0
+    w_slow = 0.34
+    w_rapido = 0.85
 
     
     INICIAL= -1
@@ -190,7 +190,7 @@ if __name__=="__main__":
         cmd_vel.publish(vel) 
 
     def avanca_rapido():
-        vel = Twist(Vector3(v_slow,0,0), Vector3(0,0,0))         
+        vel = Twist(Vector3(v_rapido,0,0), Vector3(0,0,0))         
         cmd_vel.publish(vel)
 
     def alinha():
